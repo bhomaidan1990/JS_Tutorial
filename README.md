@@ -15,12 +15,11 @@ npm run dev
 ## 2. Using **WebPack**
 
 Supposing this hierarchy:
+```sh
 |-- dist /- favicon.ico
 |    |- index.html
 |-- src /- index.js
 |       |- sub.js
-```
-
 ```
 
 ### Source Video 
