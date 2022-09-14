@@ -1,14 +1,6 @@
 # WebPack Tutorial Repo
 
 <div>
-    <style>
-    a{
-    margin: auto;
-    width: 100%;
-    /* border: 1px solid green; */
-    padding: 5px;
-    }
-    </style>
     <a href="https://www.youtube.com/watch?v=IZGNcSuwBZs">
             <img alt="Qries" src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png"
             width="30" height="30">
