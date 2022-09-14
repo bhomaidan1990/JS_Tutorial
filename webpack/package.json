@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/bhomaidan1990/JS_Tutorial/issues"
   },
-  "homepage": "https://github.com/bhomaidan1990/JS_Tutorial#readme",
+  "homepage": "https://github.com/bhomaidan1990/JS_Tutorial/blob/main/webpack#readme",
   "devDependencies": {
     "@babel/core": "^7.19.0",
     "@babel/preset-env": "^7.19.0",
