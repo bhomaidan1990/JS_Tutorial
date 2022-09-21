@@ -7,7 +7,6 @@ import {
     HemisphereLight,
     Vector3,
     Clock,
-    AnimationMixer
 } from "three";
   
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -16,6 +15,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import BasePlate from "../assets/glb/BasePlate_16x16.glb";
 import Lego_2x2 from "../assets/glb/Lego_2x2.glb";
 import Lego_2x4 from "../assets/glb/Lego_2x4.glb";
+import Lego_2x6 from "../assets/glb/Lego_2x6.glb";
 
   let container;
   let camera;
@@ -70,39 +70,41 @@ import Lego_2x4 from "../assets/glb/Lego_2x4.glb";
       model.position.copy(position);
       model.scale.set(0.05, 0.05, 0.05);
   
-      const mixer = new AnimationMixer(model);
-      mixers.push(mixer);
-  
-      const animation = result.animations[0];
-      const action = mixer.clipAction(animation);
-      action.play();
-  
       scene.add(model);
     };
   
-    const onProgress = progress => {};
+    // const onProgress = progress => {};
   
-    const parrotPosition = new Vector3(0, 0, 2.5);
+    const parrotPosition = new Vector3(0.0, 0.0, 0.0);
     loader.load(
         BasePlate,
       gltf => onLoad(gltf, parrotPosition),
-      onProgress
+      // onProgress
     );
   
-    const flamingoPosition = new Vector3(7.5, 0, -10);
+    const flamingoPosition = new Vector3(0.4, 0.48, 0.0);
     loader.load(
         Lego_2x2,
       gltf => onLoad(gltf, flamingoPosition),
-      onProgress
+      // onProgress
     );
   
-    const storkPosition = new Vector3(0, -2.5, -10);
+    const storkPosition = new Vector3(0.0, 0.0, 0.0);
     loader.load(
         Lego_2x4,
       gltf => onLoad(gltf, storkPosition),
-      onProgress
+      // onProgress
     );
+
+    const parrotPosition2 = new Vector3(0.4, 0.0, 0.8);
+    loader.load(
+      Lego_2x6,
+      gltf => onLoad(gltf, parrotPosition2),
+      // onProgress
+  );
   }
+  
+
   
   function createRenderer() {
     renderer = new WebGLRenderer({ antialias: true });
