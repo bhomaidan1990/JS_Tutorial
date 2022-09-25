@@ -9,7 +9,7 @@ import {
 } from "three";
   
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { createBase, createLego, removeLego } from "./modelCreator.js";
+import { createBase, createLego, removeLego, changeColorLego } from "./modelCreator.js";
 let container;
 let camera;
 let renderer;
@@ -48,9 +48,12 @@ export default function init() {
 
     removeLego(scene, "lego_2");
 
+    
     createControls();
     createRenderer();
-  
+    
+    changeColorLego(scene, "lego_1", 0xff0000);
+    
     renderer.setAnimationLoop(() => {
         renderer.render(scene, camera);
     });
@@ -73,7 +76,6 @@ mainLight.position.set(10, 10, 10);
 const hemisphereLight = new HemisphereLight(0xddeeff, 0x202020, 5);
 scene.add(mainLight, hemisphereLight);
 }
-/////////////////////////////////////////////////////
 
 function createControls() {
     /* Create Controls to allow for scene control */
@@ -81,20 +83,21 @@ function createControls() {
 }
 
 function createRenderer() {
-renderer = new WebGLRenderer({ antialias: true });
-renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.physicallyCorrectLights = true;
+    renderer = new WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.physicallyCorrectLights = true;
 
-container.appendChild(renderer.domElement);
+    container.appendChild(renderer.domElement);
 }
 
 function onWindowResize() {
-camera.aspect = container.clientWidth / container.clientHeight;
+    camera.aspect = container.clientWidth / container.clientHeight;
 
-// Update camera frustum
-camera.updateProjectionMatrix();
+    // Update camera frustum
+    camera.updateProjectionMatrix();
 
-renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(container.clientWidth, container.clientHeight);
 }
+
 window.addEventListener("resize", onWindowResize, false);

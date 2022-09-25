@@ -59,10 +59,8 @@ class ModelCreator {
             const model = result.scene.children[0];
             model.position.set(0.0, 0.0, 0.0);
             model.scale.set(0.05, 0.05, 0.05);
-
             for (let i = 0; i < model_containers.length; i++) {
                 model_containers[i].add(model.clone());
-                model_containers[i].name = this.model_names[i];
             }
         };
         this.loader.load(
@@ -86,6 +84,7 @@ class ModelCreator {
             
             /* Supplementary Information */
             this.model_containers[i].userData.color = this.model_colors[i];
+            this.model_containers[i].name = this.model_names[i];
             
             this.scene.add(this.model_containers[i]);
         }
@@ -183,5 +182,14 @@ export function createLego(position, color, name, scene, size=2, rot=false) {
 }
  
 export function removeLego(scene, name) {
-    scene.remove(scene.getObjectByName(name));
+    scene.remove(scene.getObjectByName(name, true));
+}
+/* This function does not work */
+export function changeColorLego(scene, name, color) {
+    if (scene.getObjectByName(name).children.length > 0) {
+        scene.getObjectByName(name).children[0].material.color.set(color);
+    }
+    else {
+        console.log(scene.getObjectByName(name).children);
+    }
 }
