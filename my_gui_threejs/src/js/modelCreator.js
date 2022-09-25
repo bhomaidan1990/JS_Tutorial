@@ -1,4 +1,11 @@
-import { Vector3, Object3D } from "three";
+import {
+    BoxGeometry,
+    Mesh,
+    MeshBasicMaterial,
+    Vector3,
+    Object3D,
+    Group,
+} from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 /* BasePlate Dimensions 6.4 x ?? x 6.4 */
@@ -49,7 +56,7 @@ class ModelCreator {
         this.scene = scene;
         this.loader = new GLTFLoader();
     }
-    create() { 
+    create = () => { 
         this.loadModel();
         this.duplicateModel();
     }
@@ -71,7 +78,7 @@ class ModelCreator {
         };
     }
 
-    duplicateModel() {
+    duplicateModel = () => {
         for (let i = 0; i < this.model_containers.length; i++) {
 
             this.model_containers[i].translateX(this.model_positions[i].x);
@@ -192,4 +199,61 @@ export function changeColorLego(scene, name, color) {
     else {
         console.log(scene.getObjectByName(name).children);
     }
+}
+
+export function createGripper(pos, scene, gripper_color = 0xaaaaaa){
+    
+    let pos_in_mm = new Vector3(
+        pos.y * 0.8 - 9.2,
+        pos.z * 0.48,
+        pos.x * 0.8 - 2.8
+    );
+    const gripper = new Group();
+    gripper.name = "gripper";
+
+    const gripper_material = new MeshBasicMaterial({ color: gripper_color });
+    // gripper_material.transparent = true;
+    gripper_material.opacity= 0.7;
+
+    //Pole
+    const pole_geometry = new BoxGeometry(0.8, 5, 0.8);
+    
+    const pole = new Mesh(pole_geometry, gripper_material);
+    pole.position.y = pos_in_mm.y + 3.7;
+    pole.position.x = pos_in_mm.x;
+    pole.position.z = pos_in_mm.z;
+    pole.name = "pole";
+
+    // Base
+    const base_geometry = new BoxGeometry(3.0, 0.6, 0.8);
+    const base = new Mesh(base_geometry, gripper_material);
+    base.position.y = pos_in_mm.y + 0.9;
+    base.position.x = pos_in_mm.x ;
+    base.position.z = pos_in_mm.z ;
+    base.name = "base";
+
+    // fingers
+    const finger_geometry = new BoxGeometry(0.8, 0.6, 0.8);
+
+    const finger_right = new Mesh(finger_geometry, gripper_material);
+    finger_right.position.y = pos_in_mm.y+0.3;
+    finger_right.position.x = pos_in_mm.x + 0.8;
+    finger_right.position.z = pos_in_mm.z;
+    finger_right.name = "finger_right";
+
+    const finger_left = new Mesh(finger_geometry, gripper_material);
+    finger_left.position.y = pos_in_mm.y+0.3;
+    finger_left.position.x = pos_in_mm.x - 0.8;
+    finger_left.position.z = pos_in_mm.z;
+    finger_left.name = "finger_left";
+
+    // adding to pole
+    gripper.add(pole);
+    gripper.add(base);
+    gripper.add(finger_right);
+    gripper.add(finger_left);
+
+    // adding to scene
+    scene.add(gripper);
+    console.log("Gripper Created");
 }

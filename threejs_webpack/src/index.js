@@ -1,4 +1,4 @@
-import init from "./js/glbLoad.js";
+import init from "./js/glbLoad3.js";
 import './styles/main.css'
 
 init();

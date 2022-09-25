@@ -1,34 +1,25 @@
 import {
-    Scene,
-    Color,
-    PerspectiveCamera,
-    WebGLRenderer,
-    DirectionalLight,
-    HemisphereLight,
     Vector3,
 } from "three";
-  
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { createBase, createLego, removeLego, changeColorLego } from "./modelCreator.js";
+
+import { createBase, createLego, removeLego, createGripper } from "./ModelCreator.js";
+import SceneCreator from "./SceneCreator.js";
+
 let container;
-let camera;
-let renderer;
-let scene;
-let controls;
 
 container = document.getElementById("container");
 
-// Creating the scene
-scene = new Scene();
-scene.background = new Color(0x21252d);
-
 export default function init() {
     
-    createCamera();
-    createLights();
+    const sceneCreator_ = new SceneCreator(container)
+    const scene = sceneCreator_.getScene();
+    const camera = sceneCreator_.getCamera();
+    const renderer = sceneCreator_.getRenderer();
+
+    const specEffects = new SpecialEffects(scene, camera, renderer)
 
     createBase(scene);
-
+    
     /**************************************************
     * TODO:
     *-------------------------------------------------
@@ -48,56 +39,5 @@ export default function init() {
 
     removeLego(scene, "lego_2");
 
-    
-    createControls();
-    createRenderer();
-    
-    changeColorLego(scene, "lego_1", 0xff0000);
-    
-    renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-    });
+    createGripper(lego_2x2_pos, scene);
 }
-  
-function createCamera() {
-const fov = 35;
-const aspect = container.clientWidth / container.clientHeight;
-const near = 0.1;
-const far = 1000;
-camera = new PerspectiveCamera(fov, aspect, near, far);
-
-camera.position.set(0.1, 60, 20);
-}
-
-function createLights() {
-const mainLight = new DirectionalLight(0xffffff, 5);
-mainLight.position.set(10, 10, 10);
-
-const hemisphereLight = new HemisphereLight(0xddeeff, 0x202020, 5);
-scene.add(mainLight, hemisphereLight);
-}
-
-function createControls() {
-    /* Create Controls to allow for scene control */
-    controls = new OrbitControls(camera, container);
-}
-
-function createRenderer() {
-    renderer = new WebGLRenderer({ antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.physicallyCorrectLights = true;
-
-    container.appendChild(renderer.domElement);
-}
-
-function onWindowResize() {
-    camera.aspect = container.clientWidth / container.clientHeight;
-
-    // Update camera frustum
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(container.clientWidth, container.clientHeight);
-}
-
-window.addEventListener("resize", onWindowResize, false);
