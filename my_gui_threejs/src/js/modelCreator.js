@@ -5,23 +5,16 @@ import {
     Vector3,
     Object3D,
     Group,
+    Color
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 /* BasePlate Dimensions 6.4 x ?? x 6.4 */
 import base_plate_path from "../assets/glb/BasePlate_16x16.glb";
 /* Lego Dimensions: (0.8 x 0.48 x 0.8) */
-import lego_2x2_red_path from "../assets/glb/Lego_2x2_red.glb";
-import lego_2x2_green_path from "../assets/glb/Lego_2x2_green.glb";
-import lego_2x2_blue_path from "../assets/glb/Lego_2x2_blue.glb";
-import lego_2x2_yellow_path from "../assets/glb/Lego_2x2_yellow.glb";
-import lego_2x2_white_path from "../assets/glb/Lego_2x2_white.glb";
-import lego_2x2_olive_path from "../assets/glb/Lego_2x2_olive.glb";
-import lego_2x2_light_path from "../assets/glb/Lego_2x2_light.glb";
-
-import lego_2x4_red_path from "../assets/glb/Lego_2x4_red.glb";
-import lego_2x4_blue_path from "../assets/glb/Lego_2x4_blue.glb";
-import lego_2x4_yellow_path from "../assets/glb/Lego_2x4_yellow.glb";
+import lego_2x2_path from "../assets/glb/Lego_2x2.glb";
+import lego_2x4_path from "../assets/glb/Lego_2x4.glb";
+import lego_2x6_path from "../assets/glb/Lego_2x6.glb";
 
 class ModelCreator {
     /******************************************************************************************
@@ -41,17 +34,18 @@ class ModelCreator {
     * ---                                                                                     *
     * Methods:                                                                                *
     * ---                                                                                     *
+    * @method: create, to call other methods and create a gltf model.                         *                                                                                 *
     * @method: loadModel, to load the glTF model and clone the instances.                     *
     * @method: duplicateModel, to duplicate the instances with the given params:              *
     *   (position, rotation, color, name)                                                     *
     ******************************************************************************************/
     constructor(model_path, model_containers,
-        model_positions, model_rotations, model_colors = null, model_names, scene) {
+        model_positions, model_rotation, model_color, model_names, scene) {
         this.model_path = model_path;
         this.model_containers = model_containers;
         this.model_positions = model_positions;
-        this.model_rotations = model_rotations;
-        this.model_colors = model_colors;
+        this.model_rotation = model_rotation;
+        this.model_color = model_color;
         this.model_names = model_names;
         this.scene = scene;
         this.loader = new GLTFLoader();
@@ -61,11 +55,12 @@ class ModelCreator {
         this.duplicateModel();
     }
     
-    loadModel() {
+    loadModel =()=> {
         const onLoad = (result, model_containers) => {
             const model = result.scene.children[0];
             model.position.set(0.0, 0.0, 0.0);
             model.scale.set(0.05, 0.05, 0.05);
+            model.material.color.set(this.model_color)
             for (let i = 0; i < model_containers.length; i++) {
                 model_containers[i].add(model.clone());
             }
@@ -85,12 +80,12 @@ class ModelCreator {
             this.model_containers[i].translateY(this.model_positions[i].y);
             this.model_containers[i].translateZ(this.model_positions[i].z);
 
-            if (this.model_rotations[i]) {
+            if (this.model_rotation) {
                 this.model_containers[i].rotateY(Math.PI/2);
             }
             
             /* Supplementary Information */
-            this.model_containers[i].userData.color = this.model_colors[i];
+            this.model_containers[i].userData.color = this.model_color;
             this.model_containers[i].name = this.model_names[i];
             
             this.scene.add(this.model_containers[i]);
@@ -102,15 +97,10 @@ export function createBase(scene) {
     /* 16x16 ==> 48x24 */
     let bases = [];
     let bases_pos = [];
-    let bases_rot = [];
-    let bases_colors = [];
     let bases_names = [];
 
     for (let i = 0; i < 6; i++) { 
         bases.push(new Object3D());
-        bases_rot.push(false);
-        /* Green Color */
-        bases_colors.push(0x00FF00);
         bases_names.push("base_"+i);
     }
 
@@ -129,33 +119,24 @@ export function createBase(scene) {
     bases_pos.push(base_pos_5);
 
     const baseCreator_ = new ModelCreator(base_plate_path, bases, bases_pos,
-        bases_rot, bases_colors, bases_names, scene);
+        false, 0x004904, bases_names, scene);
     
     baseCreator_.create()
 }
 
+
 export function createLego(position, color, name, scene, size=2, rot=false) {
     let lego = [new Object3D()];
-    const model_color = {
-        2: {
-            red: lego_2x2_red_path,
-            green: lego_2x2_green_path,
-            blue: lego_2x2_blue_path,
-            yellow: lego_2x2_yellow_path,
-            white: lego_2x2_white_path,
-            olive: lego_2x2_olive_path,
-            light: lego_2x2_light_path
-        },
-        4: {
-            red: lego_2x4_red_path,
-            blue: lego_2x4_blue_path,
-            yellow: lego_2x4_yellow_path
-        }
-};
-    let lego_rot = [rot];
-    let lego_color = [color];
-    let lego_name = [name];
-
+    const color_dict = {
+        red:    new Color(0x52010C),
+        green:  new Color(0x004904),
+        blue:   new Color(0x010C52),
+        yellow: new Color(0x5A4B00),
+        white:  new Color(0x4D4D4D),
+        olive:  new Color(0x243E02),
+        light:  new Color(0x74A545)
+    }
+    let lego_color = color_dict[color];
     let model_path;
 
     let pos_in_mm = new Vector3(
@@ -165,10 +146,10 @@ export function createLego(position, color, name, scene, size=2, rot=false) {
     );
 
     if (size == 2) {
-        model_path = model_color[size][color];
+        model_path = lego_2x2_path;
     }
     else if (size == 4) {
-        model_path = model_color[size][color];
+        model_path = lego_2x4_path;
         if (rot) {
             pos_in_mm.z += 0.4;
         }
@@ -176,29 +157,26 @@ export function createLego(position, color, name, scene, size=2, rot=false) {
             pos_in_mm.x += 0.4;
         }
     }
+    else if (size == 6) {
+        model_path = lego_2x6_path;
+        if (! rot) {
+            pos_in_mm.x += 0.8;
+            pos_in_mm.z -= 0.8;
+        }
+    }
     else { 
-        console.log("Wrong Lego Size!!, size must be 2, or 4");
+        console.log("Wrong Lego Size!!, size must be 2, 4, or 6!");
     }
     
-    let lego_pos = [pos_in_mm];
 
-    const legoCreator_ = new ModelCreator(model_path, lego, lego_pos,
-        lego_rot, lego_color, lego_name, scene);
+    const legoCreator_ = new ModelCreator(model_path, lego, [pos_in_mm],
+        rot, lego_color, [name], scene);
     
     legoCreator_.create();
 }
  
-export function removeLego(scene, name) {
+export function removeLego(scene, name) {;
     scene.remove(scene.getObjectByName(name, true));
-}
-/* This function does not work */
-export function changeColorLego(scene, name, color) {
-    if (scene.getObjectByName(name).children.length > 0) {
-        scene.getObjectByName(name).children[0].material.color.set(color);
-    }
-    else {
-        console.log(scene.getObjectByName(name).children);
-    }
 }
 
 export function createGripper(pos, scene, gripper_color = 0xaaaaaa){
@@ -255,5 +233,9 @@ export function createGripper(pos, scene, gripper_color = 0xaaaaaa){
 
     // adding to scene
     scene.add(gripper);
-    console.log("Gripper Created");
+}
+
+/* This function does not work */
+export function changeColorLego(scene, name, color) {
+    scene.getObjectByName(name).children[0].material.color.set(color);
 }
