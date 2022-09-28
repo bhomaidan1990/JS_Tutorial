@@ -2,6 +2,8 @@
 import {
     Scene,
     Color,
+    Vector3,
+    AxesHelper,
     PerspectiveCamera,
     WebGLRenderer,
     DirectionalLight,
@@ -22,11 +24,12 @@ export default class SceneCreator {
     initScene=()=> { 
         this.scene = new Scene();
         this.scene.background = new Color(0x21252d);
+
         this.createCamera();
         this.createLights();
         this.createControls();
         this.createRenderer();
-
+        this.createAxe();
         this.renderer.setAnimationLoop(() => {
             this.renderer.render(this.scene, this.camera);
         });
@@ -56,6 +59,24 @@ export default class SceneCreator {
         this.scene.add(mainLight, hemisphereLight);
     }
 
+    createAxe = (len=1.6, pos=null) => { 
+        const axis = new AxesHelper(len);
+
+        const red   = new Color(0xff0000);
+        const green = new Color(0x00ff00);
+        const blue  = new Color(0x0000ff);
+        
+        axis.setColors(red, blue, green);
+
+        if (pos === null) { 
+            pos = new Vector3(8.0, 5.0, -3.2);
+        }
+        axis.position.x = pos.x;
+        axis.position.y = pos.y;
+        axis.position.z = pos.z;
+       
+        this.scene.add(axis);
+    }
     createRenderer = ()=> {
         this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setClearColor( 0xffffff, 0 );
