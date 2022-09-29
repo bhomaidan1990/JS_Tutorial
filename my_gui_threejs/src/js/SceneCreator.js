@@ -11,6 +11,7 @@ import {
     sRGBEncoding
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 export default class SceneCreator { 
     constructor(container) { 
@@ -18,6 +19,7 @@ export default class SceneCreator {
         this.scene = null;
         this.camera = null;
         this.renderer = null;
+        this.stats = new Stats();
         this.initScene();
     }
 
@@ -30,8 +32,10 @@ export default class SceneCreator {
         this.createControls();
         this.createRenderer();
         this.createAxe();
+        this.container.appendChild(this.stats.dom);
         this.renderer.setAnimationLoop(() => {
             this.renderer.render(this.scene, this.camera);
+            this.stats.update();
         });
 
         window.addEventListener("resize", this.onWindowResize, false);
@@ -49,6 +53,7 @@ export default class SceneCreator {
     createControls=()=> {
         /* Create Controls to allow for scene control */
         const controls = new OrbitControls(this.camera, this.container);
+        controls.update();
     }
 
     createLights= ()=> {
@@ -66,7 +71,7 @@ export default class SceneCreator {
         const green = new Color(0x00ff00);
         const blue  = new Color(0x0000ff);
         
-        axis.setColors(red, blue, green);
+        axis.setColors(green, blue, red);
 
         if (pos === null) { 
             pos = new Vector3(8.0, 5.0, -3.2);
