@@ -50,7 +50,13 @@ export default class CreateLego {
 
     create_face = ()=> { 
         const face = new Group()
-        const material = new MeshPhongMaterial({ color: this.color, flatShading: true });
+        const material = new MeshPhongMaterial({
+            color: this.color,
+            flatShading: true,
+            emissive: 0,
+            specular: 0x070707,
+            shininess: 100
+        });
         material.shininess = 100;
         const stud_geometry = new CylinderGeometry(0.1, 0.1, 0.12, 16);
         const stud_1 = new Mesh(stud_geometry, material);
@@ -70,8 +76,13 @@ export default class CreateLego {
     };
 
     create_cube = () => { 
-        const material = new MeshPhongMaterial({ color: this.color, flatShading: true });
-        material.shininess = 100;
+        const material = new MeshPhongMaterial({
+            color: this.color,
+            flatShading: true,
+            emissive: 0,
+            specular: 0x070707,
+            shininess: 100
+        });
         const cube = new BoxGeometry(0.8, 0.48, 0.8);
         const lego_cube = new Mesh(cube, material);
         lego_cube.position.set(0.0, 0.24, 0.0);
