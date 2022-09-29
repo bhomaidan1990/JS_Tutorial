@@ -8,7 +8,6 @@ import {
     Color
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-
 /* BasePlate Dimensions 6.4 x ?? x 6.4 */
 import base_plate_path from "../assets/glb/BasePlate_16x16.glb";
 /* Lego Dimensions: (0.8 x 0.48 x 0.8) */
@@ -62,7 +61,7 @@ class ModelCreator {
             model.scale.set(0.05, 0.05, 0.05);
             model.material.color.set(this.model_color)
             for (let i = 0; i < model_containers.length; i++) {
-                model_containers[i].add(model.clone());
+                model_containers[i].add(model.clone(true));
             }
         };
         this.loader.load(
@@ -136,7 +135,6 @@ export function createLego(position, color, name, scene, size=2, rot=false) {
         olive:  new Color(0x243E02),
         light:  new Color(0x74A545)
     }
-    let lego_color = color_dict[color];
     let model_path;
 
     let pos_in_mm = new Vector3(
@@ -168,9 +166,8 @@ export function createLego(position, color, name, scene, size=2, rot=false) {
         console.log("Wrong Lego Size!!, size must be 2, 4, or 6!");
     }
     
-
     const legoCreator_ = new ModelCreator(model_path, lego, [pos_in_mm],
-        rot, lego_color, [name], scene);
+        rot, color_dict[color], [name], scene);
     
     legoCreator_.create();
 }
@@ -237,5 +234,32 @@ export function createGripper(pos, scene, gripper_color = 0xaaaaaa){
 
 /* This function does not work */
 export function changeColorLego(scene, name, color) {
-    scene.getObjectByName(name).children[0].material.color.set(color);
+
+    // colors
+    const red_color    = new Color(0xCC0100);
+    const green_color  = new Color(0x004904);
+    const blue_color   = new Color(0x010C52);
+    const yellow_color = new Color(0x5A4B00);
+    const white_color  = new Color(0x4D4D4D);
+    const olive_color  = new Color(0x243E02);
+    const light_color  = new Color(0x4DDD30);
+    
+    this.color_dict = {
+        red:    red_color,
+        green:  green_color,
+        blue:   blue_color,
+        yellow: yellow_color,
+        white:  white_color,
+        olive:  olive_color,
+        light:  light_color
+    }
+    
+    if (scene.getObjectByName(name).children.length > 0)
+    {
+        scene.getObjectByName(name, true).children[0].material.color.set(color_dict[color]);
+    }
+    else {
+        // This part is executed
+        console.log(scene.getObjectByName(name, true).children);
+     }
 }
