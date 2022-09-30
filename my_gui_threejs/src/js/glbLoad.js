@@ -2,7 +2,9 @@ import {
     Vector3,
 } from "three";
 
-import { createBase, createLego, removeLego, createGripper } from "./ModelCreator.js";
+// import { createBase, createLego, removeLego, changeColorLego, createGripper } from "./ModelCreator.js";
+import { createBase, removeLego, changeColorLego, createGripper } from "./ModelCreator_2.js";
+import CreateLego from "./LegoCreator.js";
 import SceneCreator from "./SceneCreator.js";
 
 let container;
@@ -16,7 +18,7 @@ export default function init() {
     const camera = sceneCreator_.getCamera();
     const renderer = sceneCreator_.getRenderer();
 
-    const specEffects = new SpecialEffects(scene, camera, renderer)
+    // const specEffects = new SpecialEffects(scene, camera, renderer)
 
     createBase(scene);
     
@@ -27,17 +29,27 @@ export default function init() {
     * myLegos = {1: [green, 2, pos_1],  2: [red, 4, pos_2], ...}
     * ------------------------------------------------
     ***************************************************/
+    
+    //(scene, size, color, name, position, rotation = false)
+    const lego_2x2_pos1 = new Vector3(2, 0, 0);
+    new CreateLego(scene, 2, "red", "lego_1", lego_2x2_pos1, false);
 
-    const lego_2x2_pos = new Vector3(1, 0, 2);
-    createLego(lego_2x2_pos, "white", "lego_1", scene);
+    const lego_2x4_pos1 = new Vector3(3, 0, 0);
+    new CreateLego(scene, 4, "olive", "lego_3", lego_2x4_pos1, true);
 
-    const lego_2x2_pos2 = new Vector3(1, 0, 0);
-    createLego(lego_2x2_pos2, "olive", "lego_3", scene);
+    const lego_2x6_pos1 = new Vector3(0, 0, 0);
+    new CreateLego(scene, 6, "light", "lego_4", lego_2x6_pos1, false);
 
-    const lego_2x4_pos = new Vector3(0, 2, 1);
-    createLego(lego_2x4_pos,"yellow", "lego_2", scene, 4, false);
+    const lego_2x2_pos2 = new Vector3(5, 2, 0);
+    new CreateLego(scene, 2, "yellow", "lego_2", lego_2x2_pos2, false);
 
-    removeLego(scene, "lego_2");
+    const lego_2x2_pos3 = new Vector3(5, 2, 1);
+    new CreateLego(scene, 2, "blue", "lego_2", lego_2x2_pos3, false);
 
-    createGripper(lego_2x2_pos, scene);
+    removeLego(scene, "lego_1");
+
+    // changeColorLego(scene, "lego_3", "blue");
+    // const grip_pos = new Vector3(0, 0, 2);
+    // createGripper(grip_pos, scene);
+    // console.log(scene);
 }

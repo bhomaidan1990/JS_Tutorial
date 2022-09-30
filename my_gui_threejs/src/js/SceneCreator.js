@@ -83,7 +83,7 @@ export default class SceneCreator {
         this.scene.add(axis);
     }
     createRenderer = ()=> {
-        this.renderer = new WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer = new WebGLRenderer('webgl2',{ antialias: true, alpha: true });
         this.renderer.setClearColor( 0xffffff, 0 );
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);

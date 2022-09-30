@@ -3,7 +3,6 @@ import {
     CylinderGeometry,
     BoxGeometry,
     Mesh,
-    MeshBasicMaterial,
     MeshPhongMaterial,
     Vector3,
     Group,
@@ -57,10 +56,9 @@ export default class CreateLego {
             specular: 0x070707,
             shininess: 100
         });
-        material.shininess = 100;
         const stud_geometry = new CylinderGeometry(0.1, 0.1, 0.12, 16);
         const stud_1 = new Mesh(stud_geometry, material);
-        const stud_shift = 0.24;
+        const stud_shift = 0.2;
         stud_1.position.set(stud_shift, 0.0, stud_shift);
         const stud_2 = new Mesh(stud_geometry, material);
         stud_2.position.set(-stud_shift, 0.0, stud_shift);

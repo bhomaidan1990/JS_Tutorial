@@ -120,10 +120,6 @@ export function createBase(scene) {
     
     baseCreator_.create()
 }
- 
-export function removeLego(scene, name) {;
-    scene.remove(scene.getObjectByName(name, true));
-}
 
 export function createGripper(pos, scene, gripper_color = 0xbbbbbb){
     
@@ -181,38 +177,4 @@ export function createGripper(pos, scene, gripper_color = 0xbbbbbb){
 
     // adding to scene
     scene.add(gripper);
-}
-
-/* This function does not work */
-export function changeColorLego(scene, name, color_) {
-    const obj = scene.getObjectByName(name, true);
-
-    // colors
-    const red_color    = new Color(0xCC0100);
-    const green_color  = new Color(0x004904);
-    const blue_color   = new Color(0x010C52);
-    const yellow_color = new Color(0x5A4B00);
-    const white_color  = new Color(0x4D4D4D);
-    const olive_color  = new Color(0x243E02);
-    const light_color  = new Color(0x4DDD30);
-    
-    const color_dict = {
-        red:    red_color,
-        green:  green_color,
-        blue:   blue_color,
-        yellow: yellow_color,
-        white:  white_color,
-        olive:  olive_color,
-        light:  light_color
-    }
-    
-    obj.traverse( (child) =>{
-        if (child.isMesh && child.geometry !== undefined) {
-            child.material.color.set(color_dict[color_]);
-            child.material.transparent = true;
-            child.material.opacity = 1;
-        }
-    });
-    // obj.material.opacity = 0.5;
-
 }
