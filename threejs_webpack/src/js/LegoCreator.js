@@ -2,8 +2,11 @@
 import {
     CylinderGeometry,
     BoxGeometry,
+    EdgesGeometry,
+    LineSegments,
     Mesh,
     MeshPhongMaterial,
+    LineBasicMaterial,
     Vector3,
     Group,
     Color
@@ -92,6 +95,12 @@ export default class CreateLego {
         });
         const cube = new BoxGeometry(0.8, 0.48, 0.8);
         const lego_cube = new Mesh(cube, material);
+        const mat = new LineBasicMaterial({ color: this.color, linewidth: 1 });
+        /* Borders*/
+        let geo = new EdgesGeometry(lego_cube.geometry);
+        let borders = new LineSegments(geo, mat);
+        borders.renderOrder = 1; // make sure borders are rendered 2nd
+        lego_cube.add( borders );
         lego_cube.position.set(0.0, 0.24, 0.0);
         return lego_cube;
     };
@@ -165,13 +174,13 @@ export default class CreateLego {
         lego.name = this.name;
         lego.userData.size = this.size;
         lego.userData.rotation = this.rotation;
-        // lego.traverse(function (node) {
-        //     if (node.isMesh) {
-        //         node.castShadow = true;
-        //     }
-        // });
-
+        
         // Add the Brick to the scene
+        // wireframe
+        
+        
+        
+        
         this.scene.add(lego);
     };
 }
