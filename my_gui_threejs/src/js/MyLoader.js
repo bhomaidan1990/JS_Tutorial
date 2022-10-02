@@ -32,7 +32,7 @@ export default function init() {
     const lego_2x2_pos1 = new Vector3(2, 2, 0);
     new CreateLego(scene, 2, "red", "lego_1", lego_2x2_pos1);
 
-    const lego_2x4_pos1 = new Vector3(0, 0, 0);
+    const lego_2x4_pos1 = new Vector3(2, 2, 1);
     new CreateLego(scene, 4, "olive", "lego_4", lego_2x4_pos1, false);
 
     const lego_2x6_pos1 = new Vector3(0, 0, 0);
@@ -49,7 +49,6 @@ export default function init() {
     removeLego(scene, "lego_2");
 
     const pp_ = new PickPlace(renderer, scene, camera,
-        "lego_4", lego_2x4_pos1, lego_2x2_pos2, true);
-    pp_.pick();
-    pp_.animatePick();
+        "lego_4", lego_2x2_pos2, true);
+    pp_.animatePickPlace();
 }

@@ -73,13 +73,11 @@ export class PickPlace {
      * @param {*} scene 
      * @param {*} camera 
      * @param {*} lego 
-     * @param {*} pick_position 
      * @param {*} place_position 
      * @param {*} place_rotation 
      ***********************************************************/
     constructor(renderer, scene, camera, lego,
-        pick_position, place_position,
-        place_rotation = false) {
+        place_position, place_rotation = false) {
         //
         this.renderer = renderer;
         this.scene = scene;
@@ -87,8 +85,11 @@ export class PickPlace {
         //
         this.lego = this.scene.getObjectByName(lego);
         //
-        console.log(this.lego.position);
-        this.pick_position = pick_position;
+        this.pick_position = new Vector3(
+            Number((Math.round( ((this.lego.position.z + 2.8) / 0.8) * 100) / 100).toFixed(1)),
+            Number((Math.round( ((this.lego.position.x + 9.2) / 0.8) * 100) / 100).toFixed(1)),
+            Number((Math.round( (this.lego.position.y/0.48 - 0.01)   * 100) / 100).toFixed(1))
+        );
         this.place_position = place_position
         this.place_rotation = place_rotation;
         this.step = 0.05;
@@ -96,6 +97,7 @@ export class PickPlace {
         this.planar_motion = false;
         this.x_lock = 0;
         this.z_lock = 0;
+        this.pick();
     };
 
     pick = () => {
@@ -125,12 +127,11 @@ export class PickPlace {
                 this.lego.translateX(-1.6);
             }
         };
-        
     };
 
-    animatePick = () => {
+    animatePickPlace = () => {
         const tolerance = 1.1 * this.step;
-        let frame_id = requestAnimationFrame(this.animatePick);
+        let frame_id = requestAnimationFrame(this.animatePickPlace);
 
         if ((this.gripper.position.y > this.lego.position.y + 0.04)
             && this.motion_down && !this.planar_motion) {
@@ -146,10 +147,12 @@ export class PickPlace {
                     if (this.lego.userData.rotation) {
                         this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
                         this.lego.position.z += 2.8 - this.pick_position.x * 0.8;
+                        this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                     else {
                         this.lego.position.z += 2.8 - this.pick_position.y * 0.8;
                         this.lego.position.x += 9.2 - this.pick_position.x * 0.8;
+                        this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                 }
                 // 2x4
@@ -158,10 +161,12 @@ export class PickPlace {
                         this.lego.rotateY(Math.PI / 2);
                         this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
                         this.lego.position.z += 2.0 - this.pick_position.x * 0.8;
+                        this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                     else {
                         this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
                         this.lego.position.z += 2.8 - this.pick_position.x * 0.8;
+                        this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                 }
                 // 2x6
@@ -170,10 +175,12 @@ export class PickPlace {
                         this.lego.rotateY(Math.PI / 2);
                         this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
                         this.lego.position.z += 1.2 - this.pick_position.x * 0.8;
+                        this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                     else {
                         this.lego.position.z += 2.8 - this.pick_position.y * 0.8;
                         this.lego.position.x += 9.2 - this.pick_position.x * 0.8;
+                        this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                 }
                 this.motion_down = false;
