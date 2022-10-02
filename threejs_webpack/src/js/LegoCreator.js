@@ -164,7 +164,10 @@ export default class CreateLego {
         else {
             // Throw an Error
             console.log(this.size);
-            throw "Lego Block size has to be 2, 4, or 6!!";
+            throw Object.assign(
+                new Error("Lego Block size has to be 2, 4, or 6!!"),
+                { code: 402 }
+             );
         }
         // Translate the Brick to Position
         this.position_lego(lego);
