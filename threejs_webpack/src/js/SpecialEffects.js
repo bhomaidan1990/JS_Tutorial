@@ -2,6 +2,7 @@
 import {
     Vector3,
     Color,
+    Clock,
 } from "three";
 
 import { createGripper } from "./ModelCreator.js";
@@ -11,8 +12,8 @@ import { createGripper } from "./ModelCreator.js";
  * @param {*} scene 
  * @param {*} name 
  **********************************************************/
-export function removeLego(scene, name) {
-    scene.remove(scene.getObjectByName(name, true));
+export function removeLego(scene, obj_name) {
+    scene.remove(scene.getObjectByName(obj_name, true));
 };
 
 /***********************************************************
@@ -21,8 +22,8 @@ export function removeLego(scene, name) {
  * @param {*} name 
  * @param {*} color_ 
  **********************************************************/
-export function changeColor(scene, name, color_) {
-    const obj = scene.getObjectByName(name, true);
+export function changeColor(scene, obj_name, color_) {
+    const obj = scene.getObjectByName(obj_name, true);
 
     // colors
     const red_color = new Color(0xCC0100);
@@ -49,14 +50,15 @@ export function changeColor(scene, name, color_) {
         }
     });
 };
+
 /***********************************************************
  * 
  * @param {*} scene 
- * @param {*} name 
+ * @param {*} obj_name 
  * @param {*} opacity_ 
  **********************************************************/
-export function changeOpacity(scene, name, opacity_) {
-    const obj = scene.getObjectByName(name, true);
+ export function changeOpacity(scene, obj_name, opacity_) {
+    const obj = scene.getObjectByName(obj_name, true);
 
     obj.traverse((child) => {
         if (child.isMesh && child.geometry !== undefined) {
@@ -65,6 +67,34 @@ export function changeOpacity(scene, name, opacity_) {
         }
     });
 };
+
+export class Blinker{
+    /**
+     * 
+     * @param {*} renderer 
+     * @param {*} scene 
+     * @param {*} camera 
+     * @param {*} obj_name 
+     */
+    constructor(renderer, scene, camera, obj_name) {
+        this.renderer = renderer;
+        this.scene = scene;
+        this.camera = camera;
+        this.obj_name = obj_name;
+    }
+    
+    blink = () => { 
+        this.frame_id = requestAnimationFrame(this.blink);
+        changeOpacity(this.scene, this.obj_name, Math.sin(this.frame_id / 10));
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    stop_blinking = () => {
+        cancelAnimationFrame(this.frame_id);
+        changeOpacity(this.scene, this.obj_name, 1.0);
+    }
+}
+
 
 export class PickPlace {
     /***********************************************************
@@ -78,18 +108,11 @@ export class PickPlace {
      ***********************************************************/
     constructor(renderer, scene, camera, lego,
         place_position, place_rotation = false) {
-        //
         this.renderer = renderer;
         this.scene = scene;
         this.camera = camera;
-        //
         this.lego = this.scene.getObjectByName(lego);
-        //
-        this.pick_position = new Vector3(
-            Number((Math.round( ((this.lego.position.z + 2.8) / 0.8) * 100) / 100).toFixed(1)),
-            Number((Math.round( ((this.lego.position.x + 9.2) / 0.8) * 100) / 100).toFixed(1)),
-            Number((Math.round( (this.lego.position.y/0.48 - 0.01)   * 100) / 100).toFixed(1))
-        );
+        this.pick_position = this.lego.userData.position;
         this.place_position = place_position
         this.place_rotation = place_rotation;
         this.step = 0.05;
@@ -98,7 +121,7 @@ export class PickPlace {
         this.x_lock = 0;
         this.z_lock = 0;
         this.pick();
-    };
+    }
 
     pick = () => {
         /* grip_pos in units, 
@@ -118,16 +141,19 @@ export class PickPlace {
         if (!this.lego.userData.rotation) {
             this.gripper.rotateY(-Math.PI / 2);
         };
-    };
+    }
 
     place = () => {
         if (this.place_rotation) {
             this.gripper.rotateY(-Math.PI / 2);
+            if (this.lego.userData.size == 4 && this.lego.userData.rotation) {
+                this.lego.translateX(-0.8);
+            }
             if (this.lego.userData.size == 6 && this.lego.userData.rotation) {
                 this.lego.translateX(-1.6);
             }
         };
-    };
+    }
 
     animatePickPlace = () => {
         const tolerance = 1.1 * this.step;
@@ -142,30 +168,23 @@ export class PickPlace {
             if (this.motion_down) {
                 this.gripper.add(this.lego);
                 this.lego.rotateY(Math.PI / 2);
-                // 2x2
+                // // 2x2
                 if (this.lego.userData.size === 2) {
-                    if (this.lego.userData.rotation) {
-                        this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
-                        this.lego.position.z += 2.8 - this.pick_position.x * 0.8;
-                        this.lego.position.y -= this.pick_position.z * 0.48;
-                    }
-                    else {
-                        this.lego.position.z += 2.8 - this.pick_position.y * 0.8;
-                        this.lego.position.x += 9.2 - this.pick_position.x * 0.8;
-                        this.lego.position.y -= this.pick_position.z * 0.48;
-                    }
+                    this.lego.position.z += 2.4 - this.pick_position.x * 0.8;
+                    this.lego.position.x += 8.8 - this.pick_position.y * 0.8;
+                    this.lego.position.y -= this.pick_position.z * 0.48;
                 }
                 // 2x4
                 else if (this.lego.userData.size === 4) {
                     if (this.lego.userData.rotation) {
                         this.lego.rotateY(Math.PI / 2);
-                        this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
-                        this.lego.position.z += 2.0 - this.pick_position.x * 0.8;
+                        this.lego.position.x += 8.8 - this.pick_position.y * 0.8;
+                        this.lego.position.z += 2.6 - this.pick_position.x * 0.8;
                         this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                     else {
-                        this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
-                        this.lego.position.z += 2.8 - this.pick_position.x * 0.8;
+                        this.lego.position.x += 8.4 - this.pick_position.y * 0.8;
+                        this.lego.position.z += 2.0 - this.pick_position.x * 0.8;
                         this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                 }
@@ -173,13 +192,13 @@ export class PickPlace {
                 else {
                     if (this.lego.userData.rotation) {
                         this.lego.rotateY(Math.PI / 2);
-                        this.lego.position.x += 9.2 - this.pick_position.y * 0.8;
-                        this.lego.position.z += 1.2 - this.pick_position.x * 0.8;
+                        this.lego.position.x += 8.8 - this.pick_position.y * 0.8;
+                        this.lego.position.z += 2.4 - this.pick_position.x * 0.8;
                         this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                     else {
-                        this.lego.position.z += 2.8 - this.pick_position.y * 0.8;
-                        this.lego.position.x += 9.2 - this.pick_position.x * 0.8;
+                        this.lego.position.z += 1.6 - this.pick_position.x * 0.8;
+                        this.lego.position.x += 8.0 - this.pick_position.y * 0.8;
                         this.lego.position.y -= this.pick_position.z * 0.48;
                     }
                 }
@@ -195,10 +214,31 @@ export class PickPlace {
             //
             if ((this.gripper.position.y >= this.grip_pos.z)
                 && !this.motion_down && this.planar_motion) {
-
-                let x_diff = this.gripper.position.x - (this.place_position.y * 0.8 - 9.2);
-                let z_diff = this.gripper.position.z - (this.place_position.x * 0.8 - 2.8);
-
+                let x_diff, z_diff;
+                if (this.lego.userData.size == 4) {
+                    if (this.lego.userData.rotation) {
+                        x_diff = this.gripper.position.x - (this.place_position.y * 0.8 - 8.8);
+                        z_diff = this.gripper.position.z - (this.place_position.x * 0.8 - 2.6);
+                    }
+                    else { 
+                        x_diff = this.gripper.position.x - (this.place_position.y * 0.8 - 8.8);
+                        z_diff = this.gripper.position.z - (this.place_position.x * 0.8 - 2.6);
+                    }
+                }
+                else if (this.lego.userData.size == 6) {
+                    if (this.lego.userData.rotation) {
+                        x_diff = this.gripper.position.x - (this.place_position.y * 0.8 - 8.8);
+                        z_diff = this.gripper.position.z - (this.place_position.x * 0.8 - 2.6);
+                    }
+                    else { 
+                        x_diff = this.gripper.position.x - (this.place_position.y * 0.8 - 8.8);
+                        z_diff = this.gripper.position.z - (this.place_position.x * 0.8 - 2.6); 
+                    }
+                }
+                else {
+                    x_diff = this.gripper.position.x - (this.place_position.y * 0.8 - 8.8);
+                    z_diff = this.gripper.position.z - (this.place_position.x * 0.8 - 2.6);
+                }
                 if ((x_diff > tolerance) && this.x_lock !== 2) {
                     this.x_lock = 1;
                     this.gripper.position.x -= this.step;
@@ -222,9 +262,8 @@ export class PickPlace {
                 }
             }
         }
-
         this.renderer.render(this.scene, this.camera);
-    };
+    }
 
     animatePlace = () => {
         this.planar_motion = false;
@@ -240,9 +279,9 @@ export class PickPlace {
             this.scene.add(this.lego);
                 /* Position World Unit to mm conversion.*/
                 this.lego.position.set(
-                    this.place_position.y * 0.8 - 9.2,
+                    this.place_position.y * 0.8 - 8.8,
                     this.place_position.z * 0.48,
-                    this.place_position.x * 0.8 - 2.8
+                    this.place_position.x * 0.8 - 2.6
                 )
             /** TODO: Move gripper up and make it vanish gradually */
             this.scene.remove(this.gripper);
@@ -250,44 +289,71 @@ export class PickPlace {
             /********************************* 
              * Place Translation/Orientation *
              *********************************/
+            // 2x4
             if (this.lego.userData.size == 4) {
-                if (this.place_rotation) { 
+                if (this.place_rotation) {
                     if (this.lego.userData.rotation) {
                         this.lego.rotateY(Math.PI / 2);
+                        console.log("Place 4, 1 1");
+                        this.lego.translateX(0.4);
+                        this.lego.translateZ(0.2);
                     }
-                    else { 
-                        this.lego.translateX(-0.8);
+                    else {
+                        console.log("Place 4, 1 2");
+                        this.lego.translateX(-0.6);
                     }
                 }
-                else { 
+                else {
                     if (this.lego.userData.rotation) {
-                        // Do Nothing
+                        console.log("Place 4, 2 1");
+                        this.lego.translateX(0.6);
                     }
-                    else { 
+                    else {
+                        console.log("Place 4, 2 2");
                         this.lego.rotateY(Math.PI / 2);
-                        this.lego.translateX(-0.8);
-                    }
-                }
-            }
-            else if (this.lego.userData.size == 6) { 
-                if (this.place_rotation) { 
-                    if (this.lego.userData.rotation) {
-                        this.lego.rotateY(Math.PI / 2);
-                    }
-                    else { 
-                        this.lego.translateX(-1.6);
-                    }
-                }
-                else { 
-                    if (this.lego.userData.rotation) {
-                        // Do Nothing
-                    }
-                    else { 
-                        this.lego.rotateY(Math.PI / 2);
-                        this.lego.translateX(-1.6);
+                        this.lego.translateX(-0.4);
+                        this.lego.translateZ(0.2);
                     }
                 }
             }
+            // 2x6
+            else if (this.lego.userData.size == 6) {
+                if (this.place_rotation) {
+                    if (this.lego.userData.rotation) {
+                        console.log("Place 6, 1 1");
+                        this.lego.rotateY(Math.PI / 2);
+                        this.lego.translateX(0.8);
+                        this.lego.translateZ(0.2);
+                    }
+                    else {
+                        console.log("Place 6, 1 2");
+                        this.lego.translateX(-1.0);
+                    }
+                }
+                else {
+                    if (this.lego.userData.rotation) {
+                        console.log("Place 6, 2 1");
+                        this.lego.translateX(1.0);
+                    }
+                    else {
+                        console.log("Place 6, 2 2");
+                        this.lego.rotateY(Math.PI / 2);
+                        this.lego.translateX(-0.8);
+                        this.lego.translateZ(-0.2);
+                    }
+                }
+            }
+            // 2x2 
+            else { 
+                if (this.place_rotation) {
+                    this.lego.translateX(-0.2);
+                }
+                else {
+                    this.lego.translateX(-0.2);
+                }
+            }
+            this.lego.translateY(0.01);
+            this.lego.userData.position = this.place_position;
         }
-    };
+    }
 }

@@ -13,15 +13,7 @@ import {
 } from "three";
 
 export default class CreateLego {
-    /**
-     * 
-     * @param {*} scene 
-     * @param {*} size 
-     * @param {*} color 
-     * @param {*} name 
-     * @param {*} position 
-     * @param {*} rotation 
-     */
+
     constructor(scene, size, color, name, position, rotation = false) {
         this.scene = scene;
         this.size = size;
@@ -46,16 +38,13 @@ export default class CreateLego {
         this.color = this.color_dict[color];
         this.name = name;
         /* position in mm */
-        this.position = new Vector3(
-            position.y * 0.8 - 9.2,
+        this.position_mm = new Vector3(
+            position.y * 0.8 - 8.8,
             position.z * 0.48 + 0.01,
-            position.x * 0.8 - 2.8
+            position.x * 0.8 - 2.4
         );
+        this.position = position;
         this.rotation = rotation;
-        this.lego_face = this.create_face();
-        this.lego_cube = this.create_cube();
-        // this.material = new MeshBasicMaterial({ color: this.color, flatShading: true });
-        //
         this.create_lego();
     };
 
@@ -85,7 +74,7 @@ export default class CreateLego {
         return face;
     };
 
-    create_cube = () => {
+    create_2x2_cube = () => {
         const material = new MeshPhongMaterial({
             color: this.color,
             flatShading: true,
@@ -107,38 +96,92 @@ export default class CreateLego {
 
     create_2x2 = () => {
         const lego_2x2 = new Group();
-        const lego_cube = this.lego_cube.clone();
-        const lego_face = this.lego_face.clone();
-        lego_face.position.set(0.0, 0.52, 0.0);
+        const lego_cube = this.create_2x2_cube();
+        const lego_face = this.create_face();
         lego_2x2.add(lego_cube);
         lego_2x2.add(lego_face);
+        lego_face.position.set(0.0, 0.52, 0.0);
         return lego_2x2
     };
 
+    create_2x4_brick = () => {
+        const material = new MeshPhongMaterial({
+            color: this.color,
+            flatShading: true,
+            emissive: 0,
+            specular: 0x070707,
+            shininess: 100
+        });
+        const brick = new BoxGeometry(1.6, 0.48, 0.8);
+        const lego_brick = new Mesh(brick, material);
+        const mat = new LineBasicMaterial({ color: this.color, linewidth: 1 });
+        /* Borders*/
+        let geo = new EdgesGeometry(lego_brick.geometry);
+        let borders = new LineSegments(geo, mat);
+        borders.renderOrder = 1; // make sure borders are rendered 2nd
+        lego_brick.add(borders);
+        lego_brick.position.set(0.0, 0.24, 0.0)
+        return lego_brick;
+    };
+    
     create_2x4 = () => {
         const lego_2x4 = new Group();
-        const lego_2x2_1 = this.create_2x2();
-        const lego_2x2_2 = this.create_2x2();
-        lego_2x2_2.position.set(0.8, 0.0, 0.0)
-        lego_2x4.add(lego_2x2_1);
-        lego_2x4.add(lego_2x2_2);
+        const lego_2x4_brick = this.create_2x4_brick();
+        const face_1 = this.create_face();
+        const face_2 = this.create_face();
+        
+        lego_2x4.add(lego_2x4_brick);
+        lego_2x4.add(face_1);
+        lego_2x4.add(face_2);
+        
+        face_1.position.set(+0.4, 0.52, 0.0);
+        face_2.position.set(-0.4, 0.52, 0.0);
+
         return lego_2x4;
+    };
+
+    create_2x6_bar = () => {
+        const material = new MeshPhongMaterial({
+            color: this.color,
+            flatShading: true,
+            emissive: 0,
+            specular: 0x070707,
+            shininess: 100
+        });
+        const bar = new BoxGeometry(2.4, 0.48, 0.8);
+        const lego_bar = new Mesh(bar, material);
+        const mat = new LineBasicMaterial({ color: this.color, linewidth: 1 });
+        /* Borders*/
+        let geo = new EdgesGeometry(lego_bar.geometry);
+        let borders = new LineSegments(geo, mat);
+        borders.renderOrder = 1; // make sure borders are rendered 2nd
+        lego_bar.add(borders);
+        lego_bar.position.set(0.0, 0.24, 0.0);
+        return lego_bar;
     };
 
     create_2x6 = () => {
         const lego_2x6 = new Group();
-        const lego_2x2 = this.create_2x2();
-        const lego_2x4 = this.create_2x4();
-        lego_2x2.position.x += 1.6;
-        lego_2x6.add(lego_2x4);
-        lego_2x6.add(lego_2x2);
+        const lego_2x6_bar = this.create_2x6_bar();
+        const face_1 = this.create_face();
+        const face_2 = this.create_face();
+        const face_3 = this.create_face();
+        
+        lego_2x6.add(lego_2x6_bar);
+        lego_2x6.add(face_1);
+        lego_2x6.add(face_2);
+        lego_2x6.add(face_3);
+
+        face_1.position.set(+0.8, 0.52, 0.0);
+        face_2.position.set(+0.0, 0.52, 0.0);
+        face_3.position.set(-0.8, 0.52, 0.0);
         return lego_2x6;
     };
 
     position_lego = (lego) => {
-        lego.translateX(this.position.x);
-        lego.translateY(this.position.y);
-        lego.translateZ(this.position.z);
+        lego.translateX(this.position_mm.x);
+        lego.translateY(this.position_mm.y);
+        lego.translateZ(this.position_mm.z);
     };
 
     create_lego = () => {
@@ -151,14 +194,20 @@ export default class CreateLego {
             // create Lego 2x4 Brick
             lego = this.create_2x4();
             if (this.rotation) {
-                lego.position.z += 0.8;
+                lego.position.z += 0.4;
+            }
+            else { 
+                lego.position.x += 0.4;
             }
         }
         else if (this.size === 6) {
             // create Lego 2x6 Brick
             lego = this.create_2x6();
             if (this.rotation) {
-                lego.position.z += 1.6;
+                lego.position.z += 0.8;
+            }
+            else { 
+                lego.position.x += 0.8;
             }
         }
         else {
@@ -177,13 +226,7 @@ export default class CreateLego {
         lego.name = this.name;
         lego.userData.size = this.size;
         lego.userData.rotation = this.rotation;
-        
-        // Add the Brick to the scene
-        // wireframe
-        
-        
-        
-        
+        lego.userData.position = this.position;
         this.scene.add(lego);
     };
 }

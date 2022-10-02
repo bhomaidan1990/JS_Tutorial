@@ -117,9 +117,9 @@ export function createBase(scene) {
 export function createGripper(scene, pos, gripper_color = 0xbbbbbb) {
 
     const pos_in_mm = new Vector3(
-        pos.y * 0.8 - 9.2,
+        pos.y * 0.8 - 8.8,
         pos.z * 0.48,
-        pos.x * 0.8 - 2.8
+        pos.x * 0.8 - 2.4
     );
 
     const gripper = new Group();
