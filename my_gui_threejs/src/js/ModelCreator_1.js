@@ -232,12 +232,3 @@ export function createGripper(pos, scene, gripper_color = 0xaaaaaa){
     // adding to scene
     scene.add(gripper);
 }
-
-/* This function does not work */
-export function changeColorLego(scene, name, color_) {
-    const obj = scene.getObjectByName(name);
-    obj.material.color.set(color_);
-    obj.material.opacity = 0.5;
-    console.log("color changed");
-    console.log(obj);
-}

@@ -14,7 +14,7 @@
   "author": "Belal",
   "license": "MIT",
   "dependencies": {
-    "three": "^0.144.0"
+    "three": "^0.145.0"
   },
   "devDependencies": {
     "css-loader": "^6.7.1",

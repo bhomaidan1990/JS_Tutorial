@@ -8,12 +8,17 @@ import {
     WebGLRenderer,
     DirectionalLight,
     HemisphereLight,
+    AmbientLight,
     sRGBEncoding
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
-export default class SceneCreator { 
+export default class SceneCreator {
+    /**
+     * 
+     * @param {*} container 
+     */
     constructor(container) { 
         this.container = container;
         this.scene = null;
@@ -21,7 +26,7 @@ export default class SceneCreator {
         this.renderer = null;
         this.stats = new Stats();
         this.initScene();
-    }
+    };
 
     initScene=()=> { 
         this.scene = new Scene();
@@ -59,9 +64,11 @@ export default class SceneCreator {
     createLights= ()=> {
         const mainLight = new DirectionalLight(0xffffff, 5);
         mainLight.position.set(10, 10, 10);
-        
+
         const hemisphereLight = new HemisphereLight(0xddeeff, 0x202020, 5);
-        this.scene.add(mainLight, hemisphereLight);
+        const ambientLight = new AmbientLight(0x404040, 5);
+
+        this.scene.add(mainLight, hemisphereLight, ambientLight);
     }
 
     createAxe = (len=1.6, pos=null) => { 
@@ -84,7 +91,7 @@ export default class SceneCreator {
     }
     createRenderer = ()=> {
         this.renderer = new WebGLRenderer('webgl2',{ antialias: true, alpha: true });
-        this.renderer.setClearColor( 0xffffff, 0 );
+        this.renderer.setClearColor( 0xA3A3A3, 0 );
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.physicallyCorrectLights = true;

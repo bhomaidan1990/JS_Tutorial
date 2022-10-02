@@ -2,10 +2,8 @@ import {
     BoxGeometry,
     Mesh,
     MeshPhongMaterial,
-    MeshBasicMaterial,
     Vector3,
-    Group,
-    Color
+    Group
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 /* BasePlate Dimensions 6.4 x ?? x 6.4 */

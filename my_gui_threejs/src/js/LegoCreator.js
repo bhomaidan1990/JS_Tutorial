@@ -9,27 +9,36 @@ import {
     Color
 } from "three";
 
-export default class CreateLego { 
+export default class CreateLego {
+    /**
+     * 
+     * @param {*} scene 
+     * @param {*} size 
+     * @param {*} color 
+     * @param {*} name 
+     * @param {*} position 
+     * @param {*} rotation 
+     */
     constructor(scene, size, color, name, position, rotation = false) {
         this.scene = scene;
         this.size = size;
         // colors
-        const red_color    = new Color(0xCC0100);
-        const green_color  = new Color(0x004904);
-        const blue_color   = new Color(0x010C52);
+        const red_color = new Color(0x660505);
+        const green_color = new Color(0x004904);
+        const blue_color = new Color(0x010C52);
         const yellow_color = new Color(0x5A4B00);
-        const white_color  = new Color(0x4D4D4D);
-        const olive_color  = new Color(0x243E02);
-        const light_color  = new Color(0x4DDD30);
-        
+        const white_color = new Color(0x4D4D4D);
+        const olive_color = new Color(0x243E02);
+        const light_color = new Color(0x3A5820);
+
         this.color_dict = {
-            red:    red_color,
-            green:  green_color,
-            blue:   blue_color,
+            red: red_color,
+            green: green_color,
+            blue: blue_color,
             yellow: yellow_color,
-            white:  white_color,
-            olive:  olive_color,
-            light:  light_color
+            white: white_color,
+            olive: olive_color,
+            light: light_color
         }
         this.color = this.color_dict[color];
         this.name = name;
@@ -47,7 +56,7 @@ export default class CreateLego {
         this.create_lego();
     };
 
-    create_face = ()=> { 
+    create_face = () => {
         const face = new Group()
         const material = new MeshPhongMaterial({
             color: this.color,
@@ -73,7 +82,7 @@ export default class CreateLego {
         return face;
     };
 
-    create_cube = () => { 
+    create_cube = () => {
         const material = new MeshPhongMaterial({
             color: this.color,
             flatShading: true,
@@ -87,7 +96,7 @@ export default class CreateLego {
         return lego_cube;
     };
 
-    create_2x2 = () => { 
+    create_2x2 = () => {
         const lego_2x2 = new Group();
         const lego_cube = this.lego_cube.clone();
         const lego_face = this.lego_face.clone();
@@ -97,7 +106,7 @@ export default class CreateLego {
         return lego_2x2
     };
 
-    create_2x4 = () => { 
+    create_2x4 = () => {
         const lego_2x4 = new Group();
         const lego_2x2_1 = this.create_2x2();
         const lego_2x2_2 = this.create_2x2();
@@ -107,7 +116,7 @@ export default class CreateLego {
         return lego_2x4;
     };
 
-    create_2x6 = () => { 
+    create_2x6 = () => {
         const lego_2x6 = new Group();
         const lego_2x2 = this.create_2x2();
         const lego_2x4 = this.create_2x4();
@@ -132,29 +141,37 @@ export default class CreateLego {
         else if (this.size === 4) {
             // create Lego 2x4 Brick
             lego = this.create_2x4();
-            if (this.rotation) { 
+            if (this.rotation) {
                 lego.position.z += 0.8;
             }
         }
-        else if (this.size === 6) { 
+        else if (this.size === 6) {
             // create Lego 2x6 Brick
             lego = this.create_2x6();
-            if (this.rotation) { 
+            if (this.rotation) {
                 lego.position.z += 1.6;
             }
         }
-        else { 
+        else {
             // Throw an Error
             console.log(this.size);
             throw "Lego Block size has to be 2, 4, or 6!!";
         }
         // Translate the Brick to Position
         this.position_lego(lego);
-        if (this.rotation) { 
-            lego.rotateY(Math.PI/2);
+        if (this.rotation) {
+            lego.rotateY(Math.PI / 2);
         };
         lego.name = this.name;
+        lego.userData.size = this.size;
+        lego.userData.rotation = this.rotation;
+        // lego.traverse(function (node) {
+        //     if (node.isMesh) {
+        //         node.castShadow = true;
+        //     }
+        // });
+
         // Add the Brick to the scene
         this.scene.add(lego);
-    };    
+    };
 }
